@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Asset Management</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      /* BODY */
+
+      body {
+        height: 100vh;
+
+        overflow-y: scroll;
+
+        scroll-snap-type: y mandatory;
+
+        background: linear-gradient(135deg, #d8b4fe, #f9a8d4);
+      }
+
+      /* SCROLLBAR */
+
+      body::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      body::-webkit-scrollbar-thumb {
+        background: #a855f7;
+        border-radius: 10px;
+      }
+
+      /* SIDEBAR */
+
+      .sidebar {
+        position: fixed;
+
+        top: 0;
+
+        left: -220px;
+
+        width: 220px;
+
+        height: 100%;
+
+        background: rgba(255, 255, 255, 0.25);
+
+        backdrop-filter: blur(15px);
+
+        padding: 30px 20px;
+
+        transition: 0.4s;
+
+        z-index: 1000;
+
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
+
+        box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+
+      /* PEEK TAB */
+
+      .peek-tab {
+        position: absolute;
+
+        right: -45px;
+
+        top: 40px;
+
+        width: 45px;
+
+        height: 60px;
+
+        background: rgba(255, 255, 255, 0.4);
+
+        backdrop-filter: blur(10px);
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+
+        cursor: pointer;
+
+        font-size: 28px;
+
+        color: #4b0082;
+
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      /* NAV BUTTONS */
+
+      .nav-btn {
+        width: 100%;
+
+        padding: 15px;
+
+        margin-bottom: 20px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background: linear-gradient(90deg, #a855f7, #ec4899);
+
+        color: white;
+
+        font-size: 16px;
+
+        cursor: pointer;
+
+        transition: 0.3s;
+      }
+
+      .nav-btn:hover {
+        transform: scale(1.04);
+      }
+
+      /* SECTION */
+
+      .section {
+        min-height: 100vh;
+
+        scroll-snap-align: start;
+
+        padding: 30px;
+      }
+
+      /* GLASS CARD */
+
+      .card {
+        width: 100%;
+
+        min-height: 90vh;
+
+        background: rgba(255, 255, 255, 0.25);
+
+        backdrop-filter: blur(18px);
+
+        border-radius: 25px;
+
+        padding: 30px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      }
+
+      /* HEADER */
+
+      .header {
+        text-align: center;
+
+        margin-bottom: 18px;
+      }
+
+      .header h1 {
+        color: #4b0082;
+
+        font-size: 38px;
+
+        font-weight: 700;
+      }
+
+      /* DASHBOARD */
+
+      .dashboard-container {
+        width: 100%;
+
+        height: 72vh;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        background: white;
+      }
+
+      iframe {
+        width: 100%;
+
+        height: 100%;
+
+        border: none;
+      }
+
+      /* SEARCH SECTION */
+
+      .search-title {
+        text-align: center;
+
+        color: #4b0082;
+
+        font-size: 32px;
+
+        margin-bottom: 22px;
+      }
+
+      /* SEARCH BAR */
+
+      .search-box {
+        width: 95%;
+
+        margin: auto;
+
+        display: flex;
+
+        gap: 12px;
+      }
+
+      .search-box input {
+        flex: 1;
+
+        padding: 14px 18px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        font-size: 16px;
+
+        outline: none;
+      }
+
+      .search-box button {
+        width: 140px;
+
+        padding: 14px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background: linear-gradient(90deg, #a855f7, #ec4899);
+
+        color: white;
+
+        font-size: 15px;
+
+        cursor: pointer;
+      }
+
+      /* RESULT CARD */
+
+      .result-box {
+        width: 95%;
+
+        min-height: 520px;
+
+        margin: 25px auto;
+
+        border-radius: 20px;
+
+        background: rgba(255, 255, 255, 0.35);
+
+        backdrop-filter: blur(12px);
+
+        padding: 30px;
+
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+
+    <div class="sidebar" id="sidebar">
+      <div class="peek-tab" onclick="toggleSidebar()">☰</div>
+
+      <button class="nav-btn" onclick="scrollToSection('dashboard')">
+        Dashboard
+      </button>
+
+      <button class="nav-btn" onclick="scrollToSection('search')">
+        Search Employee
+      </button>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+
+    <section class="section" id="dashboard">
+      <div class="card">
+        <div class="header">
+          <h1>Asset Management</h1>
+        </div>
+
+        <div class="dashboard-container">
+          <iframe src=""> </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH SECTION -->
+
+    <section class="section" id="search">
+      <div class="card">
+        <h1 class="search-title">Search Employee</h1>
+
+        <!-- SEARCH FORM -->
+
+        <form id="searchForm" class="search-box">
+          <input
+            type="text"
+            name="query"
+            placeholder="Enter Name / P. No. / Staff No."
+            required
+          />
+
+          <button type="submit">Search</button>
+        </form>
+        <!-- RESULT BOX -->
+        <div class="result-box">
+          <p>Employee details will appear here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+
+      function scrollToSection(sectionId) {
+        document.getElementById(sectionId).scrollIntoView({
+          behavior: "smooth",
+        });
+      }
+
+      // WAIT UNTIL PAGE LOADS
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchForm = document.getElementById("searchForm");
+
+        searchForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const query = document.querySelector("input[name='query']").value;
+
+          const formData = new FormData();
+          formData.append("query", query);
+
+          const response = await fetch("/search", {
+            method: "POST",
+            body: formData,
+          });
+
+          const employees = await response.json();
+
+          const resultBox = document.querySelector(".result-box");
+
+          resultBox.innerHTML = "";
+
+          // NO RESULT
+          if (employees.length === 0) {
+            resultBox.innerHTML = "<p>No employee found.</p>";
+
+            return;
+          }
+
+          // DISPLAY EMPLOYEES
+          employees.forEach((employee) => {
+            const rollStatus =
+              employee["ORCL_ROLL_STAT"] === "Y"
+                ? `<span style="color:green;font-weight:bold;">YES</span>`
+                : `<span style="color:red;font-weight:bold;">NO</span>`;
+
+            let card = `
+
+              <div style="
+                background: rgba(255,255,255,0.55);
+                padding: 25px;
+                margin-bottom: 25px;
+                border-radius: 18px;
+              ">
+
+                <div style="
+                  display:grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 25px;
+                ">
+
+                  <!-- LEFT COLUMN -->
+
+                  <div>
+
+                    <p><strong>Name :</strong> ${employee["Name"] || ""}</p>
+
+                    <p><strong>Staff No. :</strong> ${employee["Staff No."] || ""}</p>
+
+                    <p><strong>Personal No. :</strong> ${employee["P. No."] || ""}</p>
+
+                    <p><strong>Tag :</strong> ${employee["TAGGING NO."] || ""}</p>
+
+                    <p><strong>On Roll :</strong> ${rollStatus}</p>
+
+                    <p><strong>Department :</strong> ${employee["Deptt."] || ""}</p>
+
+                    <p><strong>Section :</strong> ${employee["Section"] || ""}</p>
+
+                    <p><strong>Location :</strong> ${employee["Location"] || ""}</p>
+
+                    <p><strong>PC :</strong> ${employee["PC Model"] || ""}</p>
+
+                    <p><strong>PC Sl. No. :</strong> ${employee["PC Sl. No."] || ""}</p>
+
+                    <p><strong>Monitor :</strong> ${employee["Monitor Model"] || ""}</p>
+
+                    <p><strong>Monitor Sl. No. :</strong> ${employee["Monitor Sl. No."] || ""}</p>
+
+                  </div>
+
+                  <!-- RIGHT COLUMN -->
+
+                  <div>
+
+                    <p>
+                      <strong>UPS :</strong>
+                      ${employee["UPS MAKE"] || ""}
+                      ${employee["UPS MODEL"] || ""}
+                    </p>
+
+                    <p><strong>Host Name :</strong> ${employee["HOST NAME"] || ""}</p>
+
+                    <p><strong>MAC Address :</strong> ${employee["MAC ADDRESS"] || ""}</p>
+
+                    <p><strong>OS :</strong> ${employee["OS"] || ""}</p>
+
+                    <p><strong>RAM :</strong> ${employee["RAM"] || ""}</p>
+
+                    <p>
+                      <strong>Printer :</strong>
+                      ${employee["Printer Make"] || ""}
+                      ${employee["Printer Model"] || ""}
+                    </p>
+
+                    <p>
+                      <strong>Printer Sl. No. :</strong>
+                      ${employee["Printer Sl. No."] || ""}
+                    </p>
+
+                    <p>
+                      <strong>Scanner :</strong>
+                      ${employee["Scanner Make"] || ""}
+                      ${employee["Scanner Model"] || ""}
+                    </p>
+
+                    <p>
+                      <strong>Scanner Sl. No. :</strong>
+                      ${employee["Scanner Sl.No."] || ""}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+
+            resultBox.innerHTML += card;
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
